@@ -28,7 +28,6 @@ pipeline {
  echo "Test Cases"
 '''
 
-   #     junit(allowEmptyResults: true, testResults: '**/testResults/*.xml')
       }
     }
   }
