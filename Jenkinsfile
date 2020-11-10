@@ -27,7 +27,6 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'apply' }
         }
       steps {
-        input 'Apply Plan'
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
       }
     }
@@ -37,7 +36,6 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'destroy' }
         }
       steps {
-        input 'Destroy Plan'
         sh "${env.TERRAFORM_HOME}/terraform destroy -input=false"
       }
     }
