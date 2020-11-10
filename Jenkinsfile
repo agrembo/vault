@@ -3,6 +3,7 @@ pipeline {
   environment {
     TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
     TF_IN_AUTOMATION = 'true'
+    TERRAFORM_HOME  = '/usr/local/bin/'
   }
   stages {
     stage('Terraform Init') {
