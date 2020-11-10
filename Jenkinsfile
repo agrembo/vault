@@ -13,7 +13,7 @@ pipeline {
     }
     stage('Terraform Plan') {
       steps {
-        sh "${env.TERRAFORM_HOME}/terraform plan -out=tfplan -input=false '"
+        sh "${env.TERRAFORM_HOME}/terraform plan -out=tfplan -input=false"
       }
     }
     stage('Terraform Apply') {
