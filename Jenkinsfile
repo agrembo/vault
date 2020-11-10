@@ -36,7 +36,7 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'destroy' }
         }
       steps {
-        sh "${env.TERRAFORM_HOME}/terraform destroy -input=false"
+        sh "${env.TERRAFORM_HOME}/terraform destroy -input=false -auto-approve"
       }
     }
 
