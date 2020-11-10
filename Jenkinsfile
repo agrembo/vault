@@ -1,5 +1,11 @@
 pipeline {
   agent any
+  parameters {
+        choice(
+            choices: ['apply' , 'destroy'],
+            description: '',
+            name: 'REQUESTED_ACTION')
+    }
   environment {
     TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
     TF_IN_AUTOMATION = 'true'
@@ -17,11 +23,29 @@ pipeline {
       }
     }
     stage('Terraform Apply') {
+      when { 
+            expression {
+                  expression { params.REQUESTED_ACTION == 'apply' }
+            }
+        }
       steps {
         input 'Apply Plan'
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
       }
     }
+   
+   stage('Terraform Destroy') {
+      when {
+            expression {
+                  expression { params.REQUESTED_ACTION == 'destroy' }
+            }
+        }
+      steps {
+        input 'Destroy Plan'
+        sh "${env.TERRAFORM_HOME}/terraform destroy -input=false tfplan"
+      }
+    }
+
     stage('AWSpec Tests') {
       steps {
           sh '''#!/bin/bash -l
