@@ -7,7 +7,7 @@ pipeline {
             name: 'REQUESTED_ACTION')
     }
   environment {
-    TF_WORKSPACE = 'dev' //Sets the Terraform Workspace
+    TF_WORKSPACE = 'default'
     TF_IN_AUTOMATION = 'true'
     TERRAFORM_HOME  = '/usr/local/bin/'
   }
