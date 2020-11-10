@@ -38,7 +38,7 @@ pipeline {
         }
       steps {
         input 'Destroy Plan'
-        sh "${env.TERRAFORM_HOME}/terraform destroy -input=false tfplan"
+        sh "${env.TERRAFORM_HOME}/terraform destroy -input=false"
       }
     }
 
