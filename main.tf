@@ -7,6 +7,94 @@ locals {
     __EOF__
     chmod 600 /home/ec2-user/.ssh/config
     chown ec2-user:ec2-user /home/ec2-user/.ssh/config
+    
+# Install consul
+mkdir /tmp/
+
+cd /tmp/
+
+wget https://releases.hashicorp.com/consul/1.6.1/consul_1.6.1_linux_amd64.zip
+
+
+unzip consul_1.6.1_linux_amd64.zip
+
+mv consul /usr/bin
+
+mkdir /tmp/consul /etc/consul.d/
+
+ipaddress=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $3 }'`
+cat <<EOF > /etc/systemd/system/consul.service
+[Unit]
+Description=Consul
+Documentation=https://www.consul.io/
+[Service]
+ExecStart=/usr/bin/consul agent -server -ui -bind=$ipaddress -data-dir=/tmp/consul/ -bootstrap-expect=1 -node=vault -config-dir=/etc/consul.d/
+ExecReload=/bin/kill –HUP $MAINPID
+LimitNOFILE=65536
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+
+cat <<EOF > /etc/consul.d/ui.json
+{
+        "addresses": {
+                        "http": "0.0.0.0"
+        }
+}
+EOF
+
+
+
+
+systemctl daemon-reload
+
+systemctl start consul
+
+systemcl enable consul
+
+
+
+
+echo "Deploying Vault"
+
+
+wget https://releases.hashicorp.com/vault/1.2.3/vault_1.2.3_linux_amd64.zip
+
+unzip vault_1.2.3_linux_amd64.zip
+mv vault /usr/bin
+mkdir /etc/vault
+cat <<EOF > /etc/vault/config.hcl
+storage "consul" {
+address = "127.0.0.1:8500"
+path = "vault/"
+}
+listener "tcp" {
+address = "0.0.0.0:8200"
+tls_disable = 1
+}
+ui = true
+EOF
+
+cat <<EOF > /etc/systemd/system/vault.service
+[Unit]
+Description=Vault
+Documentation=https://www.consul.io/
+[Service]
+ExecStart=/usr/bin/vault server -config=/etc/vault/config.hcl
+ExecReload=/bin/kill –HUP $MAINPID
+LimitNOFILE=65536
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+systemctl daemon-reload
+
+systemctl start vault
+
+systemctl enable vault
   USERDATA
 }
 
