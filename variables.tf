@@ -6,7 +6,7 @@ variable "vpc_id" {
 
 variable "ssh_key_pair" {
   type = string
-  default = "vault-private"
+  default = "demo-public"
 }
 
 variable "instance_type" {
