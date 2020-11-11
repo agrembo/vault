@@ -8,6 +8,7 @@ module "instance" {
   vpc_id                      = var.vpc_id
   associate_public_ip_address	= false
   ami			      = "ami-03019f3086b56872e"
+  ami_owner		      = "061551629571"
   security_groups             = [ "sg-0ed5813663af9284d" ]
   subnet                      = var.subnet
   name                        = "vault"
