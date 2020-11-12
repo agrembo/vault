@@ -1,17 +1,37 @@
+locals {
+  userdata = <<-USERDATA
+    #!/bin/bash
+    echo "Deployed via terraform" > /tmp/data
+  USERDATA
+}
 
-#### Create Instance
 
-module "instance" {
-  source                      = "git::https://github.com/cloudposse/terraform-aws-ec2-instance.git?ref=master"
-  ssh_key_pair                = var.ssh_key_pair
-  instance_type               = var.instance_type
-  vpc_id                      = var.vpc_id
-  associate_public_ip_address	= false
-  ami			      = "ami-03019f3086b56872e"
-  ami_owner		      = "061551629571"
-  security_groups             = [ "sg-0ed5813663af9284d" ]
-  subnet                      = var.subnet
-  name                        = "vault"
-  namespace                   = "akwa"
-  stage                       = "demo"
+
+
+
+
+
+
+
+module "vault_dev" {
+  source                 = "terraform-aws-modules/ec2-instance/aws"
+  version                = "~> 2.0"
+
+  name                   = "vault-dev"
+  instance_count         = 1
+
+  ami                    = "ami-0947d2ba12ee1ff75"
+  instance_type          = "t2.micro"
+  associate_public_ip_address	= "false"
+  key_name               = "demo-public"
+  monitoring             = true
+  vpc_security_group_ids = ["sg-062fe007ef208f3cb"]
+  subnet_id              = "subnet-08e3041363e87a0f4"
+  user_data_base64	 = "${base64encode(local.userdata)}"
+  
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
 }
