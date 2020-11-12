@@ -7,6 +7,31 @@ locals {
     unzip /tmp/vault.zip -d /usr/bin/
     rm -rf /tmp/vault.zip
     screen -d -m /usr/bin/vault server -dev -dev-listen-address=0.0.0.0:8200 -dev-root-token-id=bingo
+    
+    ## Testing vault policies
+    export VAULT_ADDR=http://127.0.0.1:8200
+    vault login bingo
+    # Enable userpass auth
+    vault auth enable userpass
+    
+    # Create vault policy
+    cat << POLICY > /tmp/policy
+    path "secret/*" {
+    capabilities = ["create", "read", "list", "update"]
+    }
+    POLICY
+
+    vault policy write dev /tmp/policy
+    # Create user and attach dev policy
+    vault kv put auth/userpass/users/akwa policies=dev password=akwa
+    
+
+    # Test Policy
+    vault login -method=userpass username=akwa password=akwa
+    
+    # Write some keys
+    vault kv put secret/hello foo=world
+
   USERDATA
 }
 
