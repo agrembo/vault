@@ -2,6 +2,11 @@ locals {
   userdata = <<-USERDATA
     #!/bin/bash
     echo "Deployed via terraform" > /tmp/data
+    echo "Deploying vault"
+    wget https://releases.hashicorp.com/vault/1.6.0/vault_1.6.0_linux_amd64.zip -O /tmp/vault.zip
+    unzip /tmp/vault.zip -d /usr/bin/
+    rm -rf /tmp/vault.zip
+    screen -d -m /usr/bin/vault server -dev -dev-listen-address=0.0.0.0:8200 -dev-root-token-id=bingo
   USERDATA
 }
 
