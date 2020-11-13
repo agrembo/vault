@@ -23,3 +23,10 @@ variable "public_sg_id" {
   type = string
   default = "sg-0ed5813663af9284d"
 }
+
+
+variable "source_security_group_id" {
+  type = string
+  default = "sg-062fe007ef208f3cb"
+}
+  

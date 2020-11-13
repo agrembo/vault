@@ -36,9 +36,33 @@ locals {
 }
 
 
+# Create security group to allow vault api and ssh to jenkins sg
 
+module "vault-private-sg" {
+  source = "terraform-aws-modules/security-group/aws"
 
+  name       = "vault-allow-jenkins"
+  description = "Allows 8200 and 22 to jenkins sg"
+  vpc_id      =  var.vpc_id
 
+  ingress_with_source_security_group_id = [
+    {
+      from_port		      = 8200
+      to_port		      = 8200
+      protocol		      = 6
+      description	      = "vault api"
+      source_security_group_id = var.public_sg_id 
+    },
+    {
+      from_port                = 22
+      to_port                  = 22
+      protocol                 = 6
+      description              = "SSH"
+      source_security_group_id = var.public_sg_id 
+    },
+  ]
+
+}
 
 
 
@@ -51,12 +75,12 @@ module "vault_dev" {
   instance_count         = 1
 
   ami                    = "ami-0947d2ba12ee1ff75"
-  instance_type          = "t2.micro"
+  instance_type          = var.instance_type
   associate_public_ip_address	= "false"
-  key_name               = "demo-public"
+  key_name               = var.ssh_key_pair
   monitoring             = true
-  vpc_security_group_ids = ["sg-062fe007ef208f3cb"]
-  subnet_id              = "subnet-08e3041363e87a0f4"
+  vpc_security_group_ids = [ module.vault-private-sg.this_security_group_id ]
+  subnet_id              = var.subnet
   user_data_base64	 = "${base64encode(local.userdata)}"
   
 
