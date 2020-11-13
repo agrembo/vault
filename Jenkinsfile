@@ -40,13 +40,5 @@ pipeline {
       }
     }
 
-    stage('AWSpec Tests') {
-      steps {
-          sh '''#!/bin/bash -l
- echo "Test Cases"
-'''
-
-      }
-    }
   }
 }
