@@ -5,7 +5,7 @@ locals {
     wget https://releases.hashicorp.com/consul/1.8.5/consul_1.8.5_linux_amd64.zip -O /tmp/consul.zip
     unzip /tmp/consul.zip -d /usr/bin/
 
-    mkdir -p /usr/local/bin/consul /var/consul/data
+    mkdir -p /usr/local/etc/consul /var/consul/data
     IPADDR=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $3 }'`
     NODE_NAME=`hostname`
     cat << EOF > /usr/local/etc/consul/consul.json
@@ -37,9 +37,8 @@ locals {
     PIDFile=/var/run/consul/consul.pid
     PermissionsStartOnly=true
     ExecStartPre=-/bin/mkdir -p /var/run/consul
-    ExecStartPre=/bin/chown -R consul:consul /var/run/consul
-    ExecStart=/usr/local/bin/consul agent \
-        -config-file=/usr/local/etc/consul/consul_s1.json \
+    ExecStart=/usr/bin/consul agent \
+        -config-file=/usr/local/etc/consul/consul.json \
         -pid-file=/var/run/consul/consul.pid
     ExecReload=/bin/kill -HUP $MAINPID
     KillMode=process
@@ -56,7 +55,7 @@ locals {
     systemctl start consul
 
     systemctl enable consul
-    
+
   USERDATA
 }
 
