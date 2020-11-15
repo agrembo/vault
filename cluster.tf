@@ -1,11 +1,62 @@
 locals {
   userdata = <<-USERDATA
     #!/bin/bash
-    echo "Deploying vault"
-    wget https://releases.hashicorp.com/vault/1.6.0/vault_1.6.0_linux_amd64.zip -O /tmp/vault.zip
-    unzip /tmp/vault.zip -d /usr/bin/
-    rm -rf /tmp/vault.zip
-    screen -d -m /usr/bin/vault server -dev -dev-listen-address=0.0.0.0:8200 -dev-root-token-id=bingo
+    echo "Deploy consul"
+    wget https://releases.hashicorp.com/consul/1.8.5/consul_1.8.5_linux_amd64.zip -O /tmp/consul.zip
+    unzip /tmp/consul.zip -d /usr/bin/
+
+    mkdir -p /usr/local/bin/consul /var/consul/data
+    IPADDR=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $3 }'`
+    NODE_NAME=`hostname`
+    cat << EOF > /usr/local/etc/consul/consul.json
+    {
+      "server": true,
+      "node_name": "$NODE_NAME",
+      "datacenter": "dc1",
+      "data_dir": "/var/consul/data",
+      "bind_addr": "0.0.0.0",
+      "client_addr": "0.0.0.0",
+      "advertise_addr": "$IPADDR",
+      "bootstrap_expect": 3,
+      "ui": true,
+      "log_level": "DEBUG",
+      "enable_syslog": true,
+      "acl_enforce_version_8": false
+    }
+    EOF
+
+    # Create systemd for consul
+
+    cat << EOF > /etc/systemd/system/consul.service
+    [Unit]
+    Description=Consul server agent
+    Requires=network-online.target
+    After=network-online.target
+
+    [Service]
+    PIDFile=/var/run/consul/consul.pid
+    PermissionsStartOnly=true
+    ExecStartPre=-/bin/mkdir -p /var/run/consul
+    ExecStartPre=/bin/chown -R consul:consul /var/run/consul
+    ExecStart=/usr/local/bin/consul agent \
+        -config-file=/usr/local/etc/consul/consul_s1.json \
+        -pid-file=/var/run/consul/consul.pid
+    ExecReload=/bin/kill -HUP $MAINPID
+    KillMode=process
+    KillSignal=SIGTERM
+    Restart=on-failure
+    RestartSec=42s
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+
+    systemd daemon-reload
+
+    systemctl start consul
+
+    systemctl enable consul
+    
   USERDATA
 }
 
