@@ -32,7 +32,7 @@ pipeline {
         script {
         env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
         env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
-        env.VAULT_STATE = sh( script: '/usr/loca/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true)     
+        env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true)     
         }
         echo "VAULT_STATE = ${env.VAULT_STATE}"
       }
