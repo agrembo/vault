@@ -50,7 +50,7 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'apply' }
         }
       steps {
-        echo "VAULT_ADDR" = ${env.VAULT_ADDR}
+        echo "VAULT_ADDR = ${env.VAULT_ADDR}"
       }
 
     }
