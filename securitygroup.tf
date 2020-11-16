@@ -106,6 +106,20 @@ module "vault-private-sg" {
       source_security_group_id =   module.vault-private-sg.this_security_group_id
     },
     {
+      from_port   = 8301
+      to_port     = 8301
+      protocol    = "tcp"
+      description = "Allow consul raft"
+      source_security_group_id =   module.vault-private-sg.this_security_group_id
+    },
+    {
+      from_port   = 8302
+      to_port     = 8302
+      protocol    = "tcp"
+      description = "Allow consul raft"
+      source_security_group_id =   module.vault-private-sg.this_security_group_id
+    },
+    {
       from_port   =  22
       to_port     =  22
       protocol    = "tcp"
