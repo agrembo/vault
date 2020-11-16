@@ -39,8 +39,26 @@ pipeline {
       steps {
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
       //  sleep(time:120,unit:"SECONDS")
+        def ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true) 
+        env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
+
       }
     }
+
+    stage('Vault Init') {
+      when { 
+                  expression { params.REQUESTED_ACTION == 'apply' }
+        }
+      steps {
+        echo "VAULT_ADDR" = ${env.VAULT_ADDR}
+      }
+
+    }
+
+    
+  
+
+
    
    stage('Terraform Destroy') {
       when {
