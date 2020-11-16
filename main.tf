@@ -61,6 +61,12 @@ module "vault-private-sg" {
       source_security_group_id = var.public_sg_id 
     },
   ]
+      egress_with_cidr_blocks = [
+    {
+      rule                     = "all-all"
+      cidr_blocks              = "0.0.0.0/0"
+    }
+  ]
 
 }
 
