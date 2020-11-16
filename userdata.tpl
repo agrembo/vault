@@ -99,14 +99,26 @@ systemd daemon-reload
 systemctl start vault
 systemctl enable vault
 
-# Initialize vault
+sleep 20s
 
+# Initialize vault
 export VAULT_ADDR="http://127.0.0.1:8200"
 export CONSUL_ADDR="http://127.0.0.1:8500"
-vault operator init | tee /tmp/vault.init 
-for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do vault operator unseal $i ; sleep 5 ; done
-COUNTER=1 ; for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/unseal-key-$NODE_NAME-$COUNTER -d $i ; sleep 2s ;  COUNTER=$((COUNTER + 1)) ; done
 
-export ROOT_TOKEN=`cat /tmp/vault.init | grep '^Initial' | awk '{print \$4}'`
-curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/root-token-$NODE_NAME -d $ROOT_TOKEN
+echo "Running this script will initialize & unseal Vault, then put your unseal keys and root token into Consul KV."
 
+cget() { curl -sf "$CONSUL_ADDR/v1/kv/service/vault/$1?raw"; }
+
+if [ ! $(cget root-token) ]; then
+  echo "Initialize Vault"
+  vault operator init | tee /tmp/vault.init
+  COUNTER=1 ; for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/unseal-key-$COUNTER -d $i ; sleep 2s ;  COUNTER=$((COUNTER + 1)) ; done
+  export ROOT_TOKEN=`cat /tmp/vault.init | grep '^Initial' | awk '{print \$4}'`
+  curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/root-token -d $ROOT_TOKEN
+fi
+
+
+echo "Unsealing Vault"
+vault operator unseal $(cget unseal-key-1)
+vault operator unseal $(cget unseal-key-2)
+vault operator unseal $(cget unseal-key-3)

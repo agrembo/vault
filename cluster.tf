@@ -93,7 +93,7 @@ module "vault_autoscale_group" {
   load_balancers              = [ aws_elb.this.name ]
   iam_instance_profile_name   = "ec2allowdescribe"
   scale_up_cooldown_seconds   = 20
-  scale_down_cooldown_seconds = 20
+  scale_down_cooldown_seconds = 120
   
 
   tags = {
