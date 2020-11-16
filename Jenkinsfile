@@ -57,7 +57,7 @@ pipeline {
         }
         echo "ROOT_TOKEN = ${ROOT_TOKEN}"
       */
-      sh "vault status"
+      echo "Configure vault"
       }
 
     }
