@@ -39,7 +39,8 @@ variable "elb_name" {
     default = "vault"
 }
 
-variable "elb_delete_protection" {
-   type = string
-   default = "false"
+
+variable "instance_count" {
+    type = string
+    default = 1
 }
