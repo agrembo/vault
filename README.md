@@ -30,11 +30,23 @@ terraform init
 # Verify the changes
 terraform plan
 
-# Deploy vault cluster with consul backed
+# Deploy vault cluster with consul backend
 terraform apply
 
 # Destroy everything
 terraform destroy
+
+# Once finihsed, parse load balancer dns name
+
+terraform output elb_dns_name
+
+Access Vault UI and Consul UI via web browser
+
+# Vault
+curl http://${elb_dns_name}:8200/
+
+# Consul
+curl http://${elb_dns_name}:8500/
 ```
 
 ## Contributing
