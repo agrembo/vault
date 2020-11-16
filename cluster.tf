@@ -92,8 +92,8 @@ module "vault_autoscale_group" {
  # target_group_arns           = [ aws_lb_target_group.vault.arn , aws_lb_target_group.consul.arn ]
   load_balancers              = [ aws_elb.this.name ]
   iam_instance_profile_name   = "ec2allowdescribe"
-  scale_up_cooldown_seconds   = 20
-  scale_down_cooldown_seconds = 120
+  scale_up_cooldown_seconds   = 120
+  scale_down_cooldown_seconds = 20
   
 
   tags = {
