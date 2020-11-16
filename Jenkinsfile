@@ -30,7 +30,7 @@ pipeline {
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
       //  sleep(time:120,unit:"SECONDS")
         script {
-        env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true) 
+        env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
         env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
         }
       }
