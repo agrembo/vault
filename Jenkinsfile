@@ -28,8 +28,40 @@ pipeline {
         }
       steps {
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
+        sleep(time:120,unit:"SECONDS")
+        script {
+        env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
+        env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
+        env.CONSUL_ADDR="http://${ELB_DNS_NAME}:8500"
+        env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true).trim()   
+        }
+        echo "VAULT_STATE = ${env.VAULT_STATE}"
       }
     }
+
+
+    stage('Verify Vault') {
+      when { 
+              expression { env.VAULT_STATE == 'true' }
+        }
+      steps {
+
+      echo "Configure vault"
+      script {
+          env.ROOT_TOKEN = sh( script: "curl -sf ${CONSUL_ADDR}/v1/kv/service/vault/root-token?raw", returnStdout: true).trim()
+      }
+
+      sh "vault login ${env.ROOT_TOKEN}"
+      sh "vault auth enable userpass"
+      sh "vault policy write dev-access policy.hcl"
+      sh "vault kv put auth/userpass/users/akwa policies=dev-access password=akwa"
+      sh "vault login -method=userpass username=akwa password=akwa"
+      sh "vault kv put secret/hello foo=world"
+
+      }
+
+    }
+
    
    stage('Terraform Destroy') {
       when {
@@ -41,4 +73,9 @@ pipeline {
     }
 
   }
+  post { 
+        always { 
+            cleanWs()
+        }
+    }
 }

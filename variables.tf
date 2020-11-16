@@ -1,32 +1,45 @@
-variable "vpc_id" {
-  type = string
-  default = "vpc-07d4508b74348dacb"
-
-}
-
-variable "ssh_key_pair" {
-  type = string
-  default = "demo-public"
-}
-
-variable "instance_type" {
-  type = string
-  default = "t2.micro"
-}
-
-variable "subnet" {
-  type = string
-  default = "subnet-08e3041363e87a0f4"
-}
-
-variable "public_sg_id" {
-  type = string
-  default = "sg-0ed5813663af9284d"
+variable "namespace" {
+    type = string
+    default = "myorg"
 }
 
 
-variable "source_security_group_id" {
-  type = string
-  default = "sg-062fe007ef208f3cb"
+variable "stage" {
+    type = string
+    default = "demo"
 }
-  
+
+variable "region" {
+    type = string
+    default = "us-east-1"
+
+}
+
+variable "cidr_block" {
+    type = string
+    default = "192.168.0.0/16"
+}
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "Availability zone IDs"
+  default     = ["us-east-1a", "us-east-1b"]
+}
+
+
+variable "ami_id" {
+    type     =  string
+    description = "Default AMI is amazon linux"
+    default     = "ami-0947d2ba12ee1ff75"
+}
+
+variable "elb_name" {
+    type = string
+    description = "(optional) describe your variable"
+    default = "vault"
+}
+
+variable "elb_delete_protection" {
+   type = string
+   default = "false"
+}
