@@ -3,6 +3,8 @@ resource "aws_elb" "this" {
  
   security_groups = [ module.public-sg.this_security_group_id ]
   subnets         = values(module.public_subnets.az_subnet_ids)
+  connection_draining         = true
+  connection_draining_timeout = 400
 
 
   listener {
