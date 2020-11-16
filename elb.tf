@@ -25,7 +25,7 @@ resource "aws_elb" "this" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:8500/"
+    target              = "HTTP:8500/ui/"
     interval            = 30
   }
  
