@@ -1,6 +1,6 @@
 # Vault HA
 
-Terraform script to deploy vault HA cluster with consul as backend on AWS EC2 environment as per below architecture.
+Terraform script to deploy vault HA cluster with consul as backend on AWS EC2 environment.
 
 
 ## Installation
