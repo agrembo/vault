@@ -40,7 +40,7 @@ pipeline {
     }
 
 
-    stage('Vault Configure') {
+    stage('Verify Vault') {
       when { 
               expression { env.VAULT_STATE == 'true' }
         }
@@ -53,6 +53,10 @@ pipeline {
 
       sh "vault login ${env.ROOT_TOKEN}"
       sh "vault auth enable userpass"
+      sh "vault policy write dev-access policy.hcl"
+      sh "vault kv put auth/userpass/users/akwa policies=dev-access password=akwa"
+      sh "vault login -method=userpass username=akwa password=akwa"
+      sh "vault kv put secret/hello foo=world"
 
       }
 
