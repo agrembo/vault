@@ -5,6 +5,8 @@ pipeline {
             choices: ['apply' , 'destroy'],
             description: '',
             name: 'REQUESTED_ACTION')
+        string(name: 'INSTANCE_COUNT', defaultValue: '1', description: 'No of instance to form vault cluster, Recommend to set in odd numbers')
+        booleanParam(name: 'VERIFY_VAULT', defaultValue: false, description: 'Verify vault service by creating user, policy and secrets (exprimental)')
     }
   environment {
     TF_WORKSPACE = 'default'
@@ -27,7 +29,7 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'apply' }
         }
       steps {
-        sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
+        sh "${env.TERRAFORM_HOME}/terraform apply -input=false -var instance_count=${params.INSTANCE_COUNT} tfplan"
         sleep(time:120,unit:"SECONDS")
         script {
         env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
@@ -36,13 +38,14 @@ pipeline {
         env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true).trim()   
         }
         echo "VAULT_STATE = ${env.VAULT_STATE}"
+        sh "vault status"
       }
     }
 
 
     stage('Verify Vault') {
       when { 
-              expression { env.VAULT_STATE == 'true' }
+              expression { params.VERIFY_VAULT == 'true' }
         }
       steps {
 
@@ -76,6 +79,9 @@ pipeline {
   post { 
         always { 
             cleanWs()
+            echo "Vault successfully deployed"
+            echo "To Access VAULT UI : ${env.VAULT_ADDR}"
+            echo "To Access Consul UI : ${env.CONSUL_ADDR}"
         }
     }
 }

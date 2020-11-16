@@ -82,7 +82,7 @@ module "vault_autoscale_group" {
   security_group_ids          = [ module.vault-private-sg.this_security_group_id ]
   subnet_ids                  = values(module.private_subnets.az_subnet_ids)
   health_check_type           = "EC2"
-  min_size                    = 3
+  min_size                    = var.instance_count
   max_size                    = 6
   wait_for_capacity_timeout   = "5m"
   associate_public_ip_address = false
