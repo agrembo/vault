@@ -5,7 +5,6 @@ pipeline {
             choices: ['apply' , 'destroy'],
             description: '',
             name: 'REQUESTED_ACTION')
-        string(name: 'INSTANCE_COUNT', defaultValue: '1', description: 'No of instance to form vault cluster, Recommend to set in odd numbers')
         booleanParam(name: 'VERIFY_VAULT', defaultValue: false, description: 'Verify vault service by creating user, policy and secrets (exprimental)')
     }
   environment {
@@ -29,7 +28,7 @@ pipeline {
                   expression { params.REQUESTED_ACTION == 'apply' }
         }
       steps {
-        sh "${env.TERRAFORM_HOME}/terraform apply -input=false -var instance_count=${params.INSTANCE_COUNT} tfplan"
+        sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
         sleep(time:120,unit:"SECONDS")
         script {
         env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
