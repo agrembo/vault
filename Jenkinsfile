@@ -33,7 +33,7 @@ pipeline {
         env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
         env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
         env.CONSUL_ADDR="http://${ELB_DNS_NAME}:8500"
-        env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true)     
+        env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true).trim()   
         }
         echo "VAULT_STATE = ${env.VAULT_STATE}"
       }
@@ -41,7 +41,7 @@ pipeline {
 
     stage('Vault Init') {
       when { 
-                  expression { env.VAULT_STATE == 'false' }
+              expression { env.VAULT_STATE == 'false' }
         }
       steps {
         echo "VAULT_ADDR = ${env.VAULT_ADDR}"
