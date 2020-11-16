@@ -47,11 +47,11 @@ pipeline {
         echo "VAULT_ADDR = ${env.VAULT_ADDR}"
         echo "Initializing VAULT"
         sh "vault operator init | tee vault.init"
-        sh "for i in `cat vault.init | grep '^Unseal' | awk '{print $4}'` ; do vault operator unseal $i ; done"
+        sh "for i in `cat vault.init | grep '^Unseal' | awk '{print \$4}'` ; do vault operator unseal \$i ; done"
         echo "Store vault unseal and root key in consul"
-        sh "COUNTER=1 ; for i in `cat vault.init | grep '^Unseal' | awk '{print $4}'` ; do curl -fX PUT ${CONSUL_ADDR}/v1/kv/service/vault/unseal-key-$COUNTER -d $i ;  COUNTER=$((COUNTER + 1)) ; done"
+        sh "COUNTER=1 ; for i in `cat vault.init | grep '^Unseal' | awk '{print \$4}'` ; do curl -fX PUT ${CONSUL_ADDR}/v1/kv/service/vault/unseal-key-$COUNTER -d \$i ;  COUNTER=$((COUNTER + 1)) ; done"
         script {
-          env.ROOT_TOKEN = sh(script: "cat vault.init | grep '^Initial' | awk '{print $4}'", returnStdout: true )
+          env.ROOT_TOKEN = sh(script: "cat vault.init | grep '^Initial' | awk '{print \$4}'", returnStdout: true )
         }
         echo "ROOT_TOKEN = ${ROOT_TOKEN}"
       }
