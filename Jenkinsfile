@@ -28,6 +28,7 @@ pipeline {
         }
       steps {
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
+        sleep(time:120,unit:"SECONDS")
       }
     }
    
