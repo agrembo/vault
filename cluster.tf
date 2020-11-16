@@ -7,7 +7,7 @@ locals {
 
     mkdir -p /usr/local/etc/consul /var/consul/data
     IPADDR=`ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $3 }'`
-    NODE_NAME=`hostname`
+    NODE_NAME=`hostname -s`
     cat << EOF > /usr/local/etc/consul/consul.json
     {
       "server": true,
@@ -17,6 +17,7 @@ locals {
       "bind_addr": "0.0.0.0",
       "client_addr": "0.0.0.0",
       "advertise_addr": "$IPADDR",
+      "retry_join": ["provider=aws tag_key=app tag_value=consul"],
       "bootstrap_expect": 3,
       "ui": true,
       "log_level": "DEBUG",
@@ -37,7 +38,7 @@ locals {
     PIDFile=/var/run/consul/consul.pid
     PermissionsStartOnly=true
     ExecStartPre=-/bin/mkdir -p /var/run/consul
-    ExecStart=/usr/bin/consul agent \
+    ExecStart=/usr/bin/consul agent -server\
         -config-file=/usr/local/etc/consul/consul.json \
         -pid-file=/var/run/consul/consul.pid
     ExecReload=/bin/kill -HUP $MAINPID
@@ -59,6 +60,16 @@ locals {
   USERDATA
 }
 
+
+data "template_file" "user_data" {
+  template = "${file("userdata.tpl")}"
+
+  vars = {
+    elb_dns_name = "${aws_lb.this.dns_name}"
+  }
+}
+
+
 module "vault_autoscale_group" {
   source = "git::https://github.com/cloudposse/terraform-aws-ec2-autoscale-group.git?ref=master"
 
@@ -71,19 +82,25 @@ module "vault_autoscale_group" {
   security_group_ids          = [ module.vault-private-sg.this_security_group_id ]
   subnet_ids                  = values(module.private_subnets.az_subnet_ids)
   health_check_type           = "EC2"
-  min_size                    = 1
+  min_size                    = 3
   max_size                    = 6
   wait_for_capacity_timeout   = "5m"
   associate_public_ip_address = false
-  user_data_base64            = "${base64encode(local.userdata)}"
+  #user_data_base64            = "${base64encode(local.userdata)}"
+  user_data_base64             = "${base64encode(data.template_file.user_data.rendered)}"
   key_name                    = aws_key_pair.vault-private.key_name
-  target_group_arns           = [ aws_lb_target_group.vault.arn ]
+  target_group_arns           = [ aws_lb_target_group.vault.arn , aws_lb_target_group.consul.arn ]
+  iam_instance_profile_name   = "ec2allowdescribe"
+  scale_up_cooldown_seconds   = 20
+  scale_down_cooldown_seconds = 20
+  
 
   tags = {
 
       namespace   = var.namespace
       stage       = var.stage
       name        = "vault"
+      app         = "consul"
 
   }
 

@@ -64,11 +64,32 @@ module "vault-private-sg" {
       source_security_group_id =   module.public-sg.this_security_group_id
     },
     {
+      from_port   = 8201
+      to_port     = 8201
+      protocol    = "tcp"
+      description = "Allow vault cluster port"
+      source_security_group_id =   module.vault-private-sg.this_security_group_id
+    },
+    {
       from_port   = 8300
       to_port     = 8300
       protocol    = "tcp"
+      description = "Allow consul api"
+      source_security_group_id =   module.public-sg.this_security_group_id
+    },
+    {
+      from_port   = 8500
+      to_port     = 8500
+      protocol    = "tcp"
       description = "Allow consul ui"
       source_security_group_id =   module.public-sg.this_security_group_id
+    },
+    {
+      from_port   = 8300
+      to_port     = 8300
+      protocol    = "tcp"
+      description = "Allow consul raft"
+      source_security_group_id =   module.vault-private-sg.this_security_group_id
     },
     {
       from_port   =  22

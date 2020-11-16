@@ -27,13 +27,58 @@ resource "aws_lb_listener" "front_end"  {
     type             = "forward"
     target_group_arn = aws_lb_target_group.vault.arn
   }
-
 }
 
 
+#resource "aws_lb_listener_rule" "vault_lb_listener_rule" {
+#  listener_arn = aws_lb_listener.front_end.arn
+#  priority     = 101
+#
+#  action {
+#    type             = "forward"
+#    target_group_arn = aws_lb_target_group.vault.arn
+#  }
+#
+#  condition {
+#    path_pattern {
+#      values = ["/vault*"]
+#    }
+#  }
+#
+#}
+#
+#
+#
+#resource "aws_lb_listener_rule" "consul_lb_listener_rule" {
+#  listener_arn = aws_lb_listener.front_end.arn
+#  priority     = 102
+#
+#  action {
+#    type             = "forward"
+#    target_group_arn = aws_lb_target_group.consul.arn
+#  }
+#
+#  condition {
+#    path_pattern {
+#      values = ["/consul*"]
+#    }
+#  }
+#
+#}
+#
+#
+#
 resource "aws_lb_target_group" "vault" {
   name     = "vault-target"
   port     = 8200
+  protocol = "HTTP"
+  vpc_id   = module.vpc.vpc_id
+}
+
+
+resource "aws_lb_target_group" "consul" {
+  name     = "consul-target"
+  port     = 8500
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
 }
