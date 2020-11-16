@@ -3,6 +3,9 @@
 Terraform script to deploy vault HA cluster with consul as backend on AWS EC2 environment.
 
 
+![vault cluster](https://github.com/agrembo/vault/blob/main/Vault-cluster.jpeg)
+
+
 ## Installation
 
 Download and configure terraform with appropriate version 
