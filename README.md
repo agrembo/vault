@@ -1,4 +1,4 @@
-# Vault HA
+# Vault Dev
 
 Terraform script to deploy vault in simple dev mode on AWS EC2 environment.
 
