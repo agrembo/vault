@@ -18,6 +18,8 @@ git checkout vault-cluster
 ```
 
 ## Usage
+Make sure you have right permission to create resources on EC2. 
+
 
 ```bash
 cd vault-cluster
