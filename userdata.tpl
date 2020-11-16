@@ -105,8 +105,8 @@ export VAULT_ADDR="http://${elb_dns_name}:8200"
 export CONSUL_ADDR="http://${elb_dns_name}:8500"
 vault operator init | tee /tmp/vault.init > /dev/null
 for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do vault operator unseal $i ; done
-COUNTER=1 ; for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do curl -fX PUT ${CONSUL_ADDR}/v1/kv/service/vault/unseal-key-$NODE_NAME-$COUNTER -d $i ; sleep 5s ;  COUNTER=\$((COUNTER + 1)) ; done"
+COUNTER=1 ; for i in `cat /tmp/vault.init | grep '^Unseal' | awk '{print $4}'` ; do curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/unseal-key-$NODE_NAME-$COUNTER -d $i ; sleep 5s ;  COUNTER=\$((COUNTER + 1)) ; done"
 
 export ROOT_TOKEN=`cat vault.init | grep '^Initial' | awk '{print \$4}'`
-curl -fX PUT ${CONSUL_ADDR}/v1/kv/service/vault/root-token-$NODE_NAME -d $ROOT_TOKEN
+curl -fX PUT $CONSUL_ADDR/v1/kv/service/vault/root-token-$NODE_NAME -d $ROOT_TOKEN
 

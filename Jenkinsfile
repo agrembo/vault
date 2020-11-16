@@ -39,11 +39,13 @@ pipeline {
       }
     }
 
+
     stage('Vault Init') {
       when { 
               expression { env.VAULT_STATE == 'false' }
         }
       steps {
+        /*
         echo "VAULT_ADDR = ${env.VAULT_ADDR}"
         echo "Initializing VAULT"
         sh "vault operator init | tee vault.init"
@@ -54,6 +56,8 @@ pipeline {
           env.ROOT_TOKEN = sh(script: "cat vault.init | grep '^Initial' | awk '{print \$4}'", returnStdout: true ).trim()
         }
         echo "ROOT_TOKEN = ${ROOT_TOKEN}"
+      */
+      sh "vault status"
       }
 
     }
