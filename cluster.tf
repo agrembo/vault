@@ -65,7 +65,7 @@ data "template_file" "user_data" {
   template = "${file("userdata.tpl")}"
 
   vars = {
-    elb_dns_name = "${aws_lb.this.dns_name}"
+    elb_dns_name = "${aws_elb.this.dns_name}"
   }
 }
 
@@ -89,7 +89,8 @@ module "vault_autoscale_group" {
   #user_data_base64            = "${base64encode(local.userdata)}"
   user_data_base64             = "${base64encode(data.template_file.user_data.rendered)}"
   key_name                    = aws_key_pair.vault-private.key_name
-  target_group_arns           = [ aws_lb_target_group.vault.arn , aws_lb_target_group.consul.arn ]
+ # target_group_arns           = [ aws_lb_target_group.vault.arn , aws_lb_target_group.consul.arn ]
+  load_balancers              = [ aws_elb.this.name ]
   iam_instance_profile_name   = "ec2allowdescribe"
   scale_up_cooldown_seconds   = 20
   scale_down_cooldown_seconds = 20

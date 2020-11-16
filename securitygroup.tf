@@ -26,6 +26,20 @@ module "public-sg" {
       cidr_blocks = "0.0.0.0/0"
     },
     {
+      from_port   =  8200
+      to_port     =  8200
+      protocol    = "tcp"
+      description = "Allow vault"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   =  8500
+      to_port     =  8500
+      protocol    = "tcp"
+      description = "Allow vault"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
       from_port   =  22
       to_port     =  22
       protocol    = "tcp"

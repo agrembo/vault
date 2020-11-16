@@ -57,7 +57,7 @@ mkdir -p /etc/vault/
 
 cat << EOF > /etc/vault/vault_server.hcl
 listener "tcp" {
-  address          = "127.0.0.1:8200"
+  address          = "0.0.0.0:8200"
   cluster_address  = "$IPADDR:8201"
   tls_disable      = "true"
 }
