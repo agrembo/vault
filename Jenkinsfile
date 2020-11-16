@@ -28,7 +28,7 @@ pipeline {
         }
       steps {
         sh "${env.TERRAFORM_HOME}/terraform apply -input=false tfplan"
-        sleep(time:120,unit:"SECONDS")
+        sleep(time:300,unit:"SECONDS")
         script {
         env.ELB_DNS_NAME = sh(script: 'terraform output elb_dns_name', returnStdout: true).trim() 
         env.VAULT_ADDR="http://${ELB_DNS_NAME}:8200/"
@@ -45,19 +45,15 @@ pipeline {
               expression { env.VAULT_STATE == 'false' }
         }
       steps {
-        /*
-        echo "VAULT_ADDR = ${env.VAULT_ADDR}"
-        echo "Initializing VAULT"
-        sh "vault operator init | tee vault.init"
-        sh "for i in `cat vault.init | grep '^Unseal' | awk '{print \$4}'` ; do vault operator unseal \$i ; done"
-        echo "Store vault unseal and root key in consul"
-        sh "COUNTER=1 ; for i in `cat vault.init | grep '^Unseal' | awk '{print \$4}'` ; do curl -fX PUT ${CONSUL_ADDR}/v1/kv/service/vault/unseal-key-\$COUNTER -d \$i ; sleep 5s ;  COUNTER=\$((COUNTER + 1)) ; done"
-        script {
-          env.ROOT_TOKEN = sh(script: "cat vault.init | grep '^Initial' | awk '{print \$4}'", returnStdout: true ).trim()
-        }
-        echo "ROOT_TOKEN = ${ROOT_TOKEN}"
-      */
+
       echo "Configure vault"
+      script {
+          env.ROOT_TOKEN = sh( script: "curl -sf ${CONSUL_ADDR}/v1/kv/service/vault/root-token?raw", returnStdout: true).trim()
+      }
+
+      sh "vault login ${env.ROOT_TOKEN}"
+      sh "vault auth enable userpass"
+
       }
 
     }

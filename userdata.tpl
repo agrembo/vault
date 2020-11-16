@@ -56,6 +56,7 @@ unzip /tmp/vault.zip -d /usr/bin/
 mkdir -p /etc/vault/
 
 cat << EOF > /etc/vault/vault_server.hcl
+ui = true
 listener "tcp" {
   address          = "0.0.0.0:8200"
   cluster_address  = "$IPADDR:8201"

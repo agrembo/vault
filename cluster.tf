@@ -86,7 +86,7 @@ module "vault_autoscale_group" {
   max_size                    = 6
   wait_for_capacity_timeout   = "5m"
   associate_public_ip_address = false
-  #user_data_base64            = "${base64encode(local.userdata)}"
+  #user_data_base64            = "${base64ncode(local.userdata)}"
   user_data_base64             = "${base64encode(data.template_file.user_data.rendered)}"
   key_name                    = aws_key_pair.vault-private.key_name
  # target_group_arns           = [ aws_lb_target_group.vault.arn , aws_lb_target_group.consul.arn ]
