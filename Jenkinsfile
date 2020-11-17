@@ -37,7 +37,6 @@ pipeline {
         env.VAULT_STATE = sh( script: '/usr/local/bin/vault status -format yaml | grep initialized | cut -c 14-', returnStdout: true).trim()   
         }
         echo "VAULT_STATE = ${env.VAULT_STATE}"
-        sh "vault status"
       }
     }
 
